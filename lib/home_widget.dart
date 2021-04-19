@@ -8,7 +8,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
-import 'marker_popup.dart';
+import 'markers/marker_cur_popup.dart';
+import 'markers/marker_new_popup.dart';
 import 'order/order_new_widget.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -17,35 +18,47 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  String pageType = "curOrder";
+  String pageType = "orders";
   bool orderAccepted = false;
-  late OrderWidget curOrder = OrderWidget(
-    order: Order('pizza', LatLng(53.307931, 34.301674), 'кв.10'),
-    showOnMap: _showLocOnMap,
-  );
+  late OrderWidget curOrder;
   LatLng _center = const LatLng(53.269661, 34.347649);
   LatLng _curPos = const LatLng(53.269661, 34.347649);
   late GoogleMapController _mapController;
   Location _location = Location();
   bool styleChanged = false;
-  final List<Marker> _markers = [];
+  final Set<Marker> _markers = {};
+  List<NewOrder> newOrdersW = [];
+  List<AcceptedOrder> acceptedOrdersW = [];
 
   Set<Polyline> _polylines = {};
-  List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
 
-  Marker? _pathMarker = null;
+  Set<Marker> _pathMarker = {};
 
-  _showLocOnMap(LatLng latlng) {
-    _markers.clear();
+  _showCurOrdOnMap(LatLng latlng) {
     setState(() {
       _center = latlng;
-      _markers.clear();
       final marker = Marker(
-        markerId: MarkerId(_center.toString()),
+        markerId: MarkerId(latlng.toString()),
         position: _center,
         onTap: () {
-          _openMarker(MarkerId(_center.toString()));
+          _openCurMarker(MarkerId(latlng.toString()));
+        },
+      );
+      _markers.add(marker);
+      pageType = 'map';
+    });
+  }
+
+  _showNewOrdOnMap(LatLng latlng) {
+    setState(() {
+      _center = latlng;
+      final marker = Marker(
+        alpha: 0.5,
+        markerId: MarkerId(latlng.toString()),
+        position: _center,
+        onTap: () {
+          _openNewMarker(MarkerId(latlng.toString()));
         },
       );
       _markers.add(marker);
@@ -72,61 +85,101 @@ class _HomeWidgetState extends State<HomeWidget> {
         CameraPosition(target: _center, zoom: 15)));
   }
 
-  _openMarker(MarkerId markerId) {
+  _openCurMarker(MarkerId markerId) {
     Marker curMark = _markers.firstWhere((m) => m.markerId == markerId);
 
     showDialog(
       context: context,
-      builder: (_) => MarkerPopupWidget(
-          curMark: curMark,
-          deleteMarker: _deleteMarker,
-          drawPath: _drawMarkerPath),
+      builder: (_) =>
+          MarkerCurPopupWidget(curMark: curMark, drawPath: _drawMarkerPath),
+    );
+  }
+
+  _openNewMarker(MarkerId markerId) {
+    Marker curMark = _markers.firstWhere((m) => m.markerId == markerId);
+
+    showDialog(
+      context: context,
+      builder: (_) => MarkerNewPopupWidget(
+        curMark: curMark,
+        deleteMarker: _deleteMarker,
+      ),
     );
   }
 
   _deleteMarker(Marker mark) {
     setState(() {
       _markers.remove(mark);
-      _pathMarker=null;
+      _pathMarker.remove(mark);
       _polylines.clear();
+      _drawPath();
     });
   }
 
   _drawMarkerPath(Marker mark) {
     setState(() {
-      _pathMarker = mark;
+      if (_pathMarker.contains(mark)) {
+        _pathMarker.remove(mark);
+      } else {
+        _pathMarker.add(mark);
+      }
     });
     _drawPath();
   }
 
   _drawPath() async {
-    if (_pathMarker != null) {
-      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        'AIzaSyBXHvMXQfB5NfrtrCpVxzIClhk8ni1lNiA',
-        PointLatLng(_curPos.latitude, _curPos.longitude),
-        PointLatLng(
-            _pathMarker!.position.latitude, _pathMarker!.position.longitude),
-      );
+    //List<Polyline> polylines=[];
+    _polylines.clear();
 
-      if (result.points.isNotEmpty) {
-        polylineCoordinates.clear();
-        result.points.forEach((PointLatLng point) {
-          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        });
-      }
-      setState(() {
+    LatLng lastPos = LatLng(_curPos.latitude, _curPos.longitude);
+    if (_pathMarker.length > 0) {
+      await Future.forEach(_pathMarker, (Marker marker) async {
+        List<LatLng> polylineCoordinates = [];
+
+        PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          'AIzaSyBXHvMXQfB5NfrtrCpVxzIClhk8ni1lNiA',
+          PointLatLng(lastPos.latitude, lastPos.longitude),
+          PointLatLng(marker.position.latitude, marker.position.longitude),
+        );
+
+        if (result.points.isNotEmpty) {
+          polylineCoordinates.clear();
+          result.points.forEach((PointLatLng point) {
+            polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+          });
+        }
+
+        lastPos = LatLng(marker.position.latitude, marker.position.longitude);
         Polyline polyline = Polyline(
-            polylineId: PolylineId("poly"),
+            polylineId: PolylineId("poly" + marker.position.toString()),
             color: Color.fromARGB(255, 40, 122, 198),
             points: polylineCoordinates);
-        _polylines.clear();
         _polylines.add(polyline);
+      });
+      setState(() {
+        _polylines = _polylines;
       });
     }
   }
 
+  _initializeOrders() async {
+    curOrder = OrderWidget(
+      order: Order('pizza', LatLng(53.307931, 34.301674), 'кв.10'),
+      showOnMap: _showCurOrdOnMap,
+    );
+    acceptedOrdersW.add(AcceptedOrder(order: curOrder));
+    curOrder = OrderWidget(
+      order: Order('pizza', LatLng(54.307931, 34.301674), 'кв.10'),
+      showOnMap: _showNewOrdOnMap,
+    );
+    newOrdersW.add(NewOrder(order: curOrder));
+    newOrdersW.add(NewOrder(order: curOrder));
+  }
+
   @override
   void initState() {
+    _initializeOrders();
+
     super.initState();
   }
 
@@ -137,32 +190,59 @@ class _HomeWidgetState extends State<HomeWidget> {
         title: Text('Courier prototype'),
         backgroundColor: Colors.orange,
       ),
-      backgroundColor: Colors.orange[100],
+      backgroundColor: Colors.orange[200],
       body: Stack(
         children: (() {
           switch (pageType) {
-            case "curOrder":
-              if (orderAccepted) {
-                return <Widget>[
-                  AcceptedOrder(order: curOrder),
-                ];
-              }
+            case "orders":
               return <Widget>[
-                NewOrder(order: curOrder),
+                SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                          (() {
+                            if (acceptedOrdersW.length > 0) {
+                              return RichText(
+                                  text: TextSpan(
+                                      text: 'Current orders:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 40,
+                                          color: Colors.white)));
+                            }
+                            return Container();
+                          }())
+                        ] +
+                        acceptedOrdersW +
+                        <Widget>[
+                          (() {
+                            if (newOrdersW.length > 0) {
+                              return RichText(
+                                  text: TextSpan(
+                                      text: 'New orders:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 40,
+                                          color: Colors.white)));
+                            }
+                            return Container();
+                          }())
+                        ] +
+                        newOrdersW,
+                  ),
+                ),
               ];
             case "map":
               return <Widget>[
                 GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: _center,
-                    zoom: 15,
-                  ),
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  onMapCreated: _onMapCreated,
-                  markers: _markers.toSet(),
-                  polylines: _polylines,
-                ),
+                    initialCameraPosition: CameraPosition(
+                      target: _center,
+                      zoom: 15,
+                    ),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    onMapCreated: _onMapCreated,
+                    markers: _markers.toSet(),
+                    polylines: _polylines),
                 (() {
                   if (styleChanged == false) {
                     return Container(
@@ -198,14 +278,14 @@ class _HomeWidgetState extends State<HomeWidget> {
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
                   color: (() {
-                    if (pageType == "curOrder") {
+                    if (pageType == "orders") {
                       return Colors.white;
                     }
                     return Colors.orange[100];
                   }()),
                   onPressed: () {
                     setState(() {
-                      pageType = "curOrder";
+                      pageType = "orders";
                     });
                   },
                 ),

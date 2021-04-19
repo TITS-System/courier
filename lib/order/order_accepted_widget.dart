@@ -21,22 +21,13 @@ class _AcceptedOrderState extends State<AcceptedOrder> {
         borderRadius: BorderRadius.all(Radius.circular(40)),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           widget.order!,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                flex: 4,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
-                  onPressed: () {},
-                  child: Text('cancel'),
-                ),
-              ),
-              Expanded(flex: 1, child: Container()),
               Expanded(
                 flex: 4,
                 child: ElevatedButton(

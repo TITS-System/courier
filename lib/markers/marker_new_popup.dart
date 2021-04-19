@@ -2,19 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class MarkerPopupWidget extends StatefulWidget {
+class MarkerNewPopupWidget extends StatefulWidget {
 final Marker? curMark;
 final Function? deleteMarker;
-final Function? drawPath;
-const MarkerPopupWidget(
-      { Key? key,this.curMark,this.deleteMarker,this.drawPath}) 
+const MarkerNewPopupWidget(
+      { Key? key,this.curMark,this.deleteMarker}) 
       : super(key: key);
 
   @override
-  _MarkerPopupWidgetState createState() => _MarkerPopupWidgetState();
+  _MarkerNewPopupWidgetState createState() => _MarkerNewPopupWidgetState();
 }
 
-class _MarkerPopupWidgetState extends State<MarkerPopupWidget> {
+class _MarkerNewPopupWidgetState extends State<MarkerNewPopupWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -31,14 +30,6 @@ class _MarkerPopupWidgetState extends State<MarkerPopupWidget> {
                       Navigator.of(context).pop();
                     },
                     child: Text('Delete'),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: Colors.orange),
-                    onPressed: () {
-                      widget.drawPath!(widget.curMark);
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Draw Path'),
                   ),
                 ],
               ),

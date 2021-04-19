@@ -21,7 +21,7 @@ class _NewOrderState extends State<NewOrder> {
         borderRadius: BorderRadius.all(Radius.circular(40)),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           widget.order!,
@@ -31,16 +31,7 @@ class _NewOrderState extends State<NewOrder> {
               Expanded(
                 flex: 4,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.grey),
-                  onPressed: () {},
-                  child: Text('decline'),
-                ),
-              ),
-              Expanded(flex: 1, child: Container()),
-              Expanded(
-                flex: 4,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.orange),
+                  style: ElevatedButton.styleFrom(primary: Colors.blue),
                   onPressed: () {},
                   child: Text('accept'),
                 ),
