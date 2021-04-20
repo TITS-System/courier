@@ -1,6 +1,8 @@
+import 'package:courier_prototype/messages/message_page.dart';
 import 'package:courier_prototype/order/order.dart';
 import 'package:courier_prototype/order/order_accepted_widget.dart';
 import 'package:courier_prototype/order/order_widget.dart';
+import 'package:courier_prototype/profile/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -187,10 +189,11 @@ class _HomeWidgetState extends State<HomeWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Courier prototype'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.white,
+        toolbarHeight: 10,
+        
       ),
-      backgroundColor: Colors.orange[200],
+      backgroundColor: Colors.white,
       body: Stack(
         children: (() {
           switch (pageType) {
@@ -207,7 +210,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 40,
-                                          color: Colors.white)));
+                                          color: Colors.black)));
                             }
                             return Container();
                           }())
@@ -222,7 +225,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 40,
-                                          color: Colors.white)));
+                                          color: Colors.black)));
                             }
                             return Container();
                           }())
@@ -246,7 +249,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 (() {
                   if (styleChanged == false) {
                     return Container(
-                      color: Colors.orange[100],
+                      color: Color.fromARGB(155, 255, 105, 0),
                       height: double.infinity,
                       width: double.infinity,
                       child: Align(
@@ -258,6 +261,14 @@ class _HomeWidgetState extends State<HomeWidget> {
                   }
                 }()),
               ];
+            case "profile":
+              return <Widget>[
+                ProfileWidget(),
+              ];
+            case "messages":
+              return <Widget>[
+                MessagePage(),
+              ];
             default:
               return <Widget>[];
           }
@@ -268,7 +279,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         color: Colors.white,
         child: Container(
             decoration: BoxDecoration(
-              color: Colors.orange,
+              color: Colors.white,
             ),
             child: Row(
               children: [
@@ -279,9 +290,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                   highlightColor: Colors.transparent,
                   color: (() {
                     if (pageType == "orders") {
-                      return Colors.white;
+                      return Color.fromARGB(255, 255, 105, 0);
                     }
-                    return Colors.orange[100];
+                    return Color.fromARGB(155, 255, 105, 0);
                   }()),
                   onPressed: () {
                     setState(() {
@@ -296,13 +307,47 @@ class _HomeWidgetState extends State<HomeWidget> {
                   highlightColor: Colors.transparent,
                   color: (() {
                     if (pageType == "map") {
-                      return Colors.white;
+                      return Color.fromARGB(255, 255, 105, 0);
                     }
-                    return Colors.orange[100];
+                    return Color.fromARGB(155, 255, 105, 0);
                   }()),
                   onPressed: () {
                     setState(() {
                       pageType = "map";
+                    });
+                  },
+                ),
+                IconButton(
+                  iconSize: 30,
+                  icon: Icon(Icons.person),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  color: (() {
+                    if (pageType == "profile") {
+                      return Color.fromARGB(255, 255, 105, 0);
+                    }
+                    return Color.fromARGB(155, 255, 105, 0);
+                  }()),
+                  onPressed: () {
+                    setState(() {
+                      pageType = "profile";
+                    });
+                  },
+                ),
+                IconButton(
+                  iconSize: 30,
+                  icon: Icon(Icons.message),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  color: (() {
+                    if (pageType == "messages") {
+                      return Color.fromARGB(255, 255, 105, 0);
+                    }
+                    return Color.fromARGB(155, 255, 105, 0);
+                  }()),
+                  onPressed: () {
+                    setState(() {
+                      pageType = "messages";
                     });
                   },
                 ),

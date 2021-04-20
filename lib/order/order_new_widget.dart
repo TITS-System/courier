@@ -17,8 +17,9 @@ class _NewOrderState extends State<NewOrder> {
       padding: EdgeInsets.all(20),
       margin: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 255, 255, 255),
-        borderRadius: BorderRadius.all(Radius.circular(40)),
+        color: Color.fromARGB(0, 255, 105, 0),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        border: Border.all(color: Color.fromARGB(255, 255, 105, 0), width: 3),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -33,7 +34,10 @@ class _NewOrderState extends State<NewOrder> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.blue),
                   onPressed: () {},
-                  child: Text('accept'),
+                  child: RichText(
+                      text: TextSpan(
+                          text: 'accept',
+                          style: TextStyle(color: Colors.white, fontSize: 20))),
                 ),
               ),
             ],

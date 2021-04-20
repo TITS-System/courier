@@ -17,8 +17,9 @@ class _AcceptedOrderState extends State<AcceptedOrder> {
       padding: EdgeInsets.all(20),
       margin: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 255, 255, 255),
-        borderRadius: BorderRadius.all(Radius.circular(40)),
+        color: Color.fromARGB(0, 255, 105, 0),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+        border: Border.all(color: Color.fromARGB(255, 255, 105, 0), width: 3),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -31,9 +32,12 @@ class _AcceptedOrderState extends State<AcceptedOrder> {
               Expanded(
                 flex: 4,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Colors.green),
+                  style: ElevatedButton.styleFrom(primary: Color.fromARGB(255, 55, 179, 74)),
                   onPressed: () {},
-                  child: Text('finish'),
+                  child: RichText(
+                      text: TextSpan(
+                          text: 'finish',
+                          style: TextStyle(color: Colors.white, fontSize: 20))),
                 ),
               ),
             ],

@@ -13,7 +13,7 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange,
+      backgroundColor: Color.fromARGB(255, 255, 105, 0),
       body: Container(
         padding: EdgeInsets.all(10),
         child: Column(
@@ -68,18 +68,6 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    flex: 4,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(primary: Colors.white),
-                        onPressed: () {},
-                        child: RichText(
-                            text: TextSpan(
-                                text: 'register',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 20)))),
-                  ),
-                  Expanded(flex: 1, child: Container()),
                   Expanded(
                     flex: 4,
                     child: ElevatedButton(
