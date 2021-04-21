@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:courier_prototype/home_widget.dart';
 import 'package:courier_prototype/messages/message_widget.dart';
 import 'package:courier_prototype/order/order.dart';
+import 'package:courier_prototype/order/order_accepted_widget.dart';
 import 'package:courier_prototype/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
@@ -146,6 +147,102 @@ class SendCourierMessageDto {
   final int courierId;
 }
 
+@JsonSerializable()
+class BeginDeliveryDto {
+  BeginDeliveryDto({required this.courierId, required this.orderId});
+
+  factory BeginDeliveryDto.fromJson(Map<String, dynamic> json) {
+    return BeginDeliveryDto(
+        courierId: json['courierId'] as int, orderId: json['orderId'] as int);
+  }
+
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{'courierId': this.courierId, 'orderId': this.orderId};
+
+  final int courierId;
+  final int orderId;
+}
+
+@JsonSerializable()
+class DeliveryDto {
+  DeliveryDto({required this.orderId, required this.courierId});
+
+  factory DeliveryDto.fromJson(Map<String, dynamic> json) {
+    return DeliveryDto(
+        orderId: json['orderId'] as int, courierId: json['courierId'] as int);
+  }
+
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{'orderId': this.orderId, 'courierId': this.courierId};
+
+  final int orderId;
+  final int courierId;
+}
+
+@JsonSerializable()
+class DeliveriesDto {
+  DeliveriesDto({required this.deliveries});
+
+  factory DeliveriesDto.fromJson(Map<String, dynamic> json) {
+    return DeliveriesDto(
+        deliveries: (json['deliveries'] as List<dynamic>)
+            .map((e) => DeliveryDto.fromJson(e as Map<String, dynamic>))
+            .toList());
+  }
+
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{'deliveries': this.deliveries};
+
+  final List<DeliveryDto> deliveries;
+}
+
+@JsonSerializable()
+class LatLngDto {
+  LatLngDto({required this.lat, required this.lng});
+
+  factory LatLngDto.fromJson(Map<String, dynamic> json) {
+    return LatLngDto(
+        lat: (json['lat'] as num).toDouble(),
+        lng: (json['lng'] as num).toDouble());
+  }
+
+  Map<String, dynamic> toJson() =>
+      <String, dynamic>{'lat': this.lat, 'lng': this.lng};
+
+  final double lat;
+  final double lng;
+}
+
+@JsonSerializable()
+class OrderDto {
+  OrderDto(
+      {required this.content,
+      required this.addressString,
+      required this.addressAdditional,
+      required this.destination});
+
+  factory OrderDto.fromJson(Map<String, dynamic> json) {
+    return OrderDto(
+        content: json['content'] as String,
+        addressString: json['addressString'] as String,
+        addressAdditional: json['addressAdditional'] as String,
+        destination: null);
+    //LatLngDto.fromJson(json['destination'] as Map<String, dynamic>));
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'content': this.content,
+        'addressString': this.addressString,
+        'addressAdditional': this.addressAdditional,
+        'destination': this.destination
+      };
+
+  final String content;
+  final String addressString;
+  final String addressAdditional;
+  final LatLngDto? destination;
+}
+
 String baseUrl = "https://192.168.21.104:8443/api";
 
 Future<void> login(LoginDto LoginDto, BuildContext context) async {
@@ -154,6 +251,9 @@ Future<void> login(LoginDto LoginDto, BuildContext context) async {
     ..badCertificateCallback =
         ((X509Certificate cert, String host, int port) => trustSelfSigned);
   IOClient ioClient = new IOClient(httpClient);
+
+  print('object');
+  print(baseUrl + '/courier/login');
 
   final response = await ioClient.post(Uri.parse(baseUrl + '/courier/login'),
       headers: {
@@ -175,7 +275,7 @@ Future<void> login(LoginDto LoginDto, BuildContext context) async {
   }
 }
 
-Future<Set<Order>> getOrders(int restId) async {
+Future<Set<Order>> getNewOrders(int restId) async {
   Set<Order> orders = {};
   SingletonDS db = SingletonDS();
 
@@ -202,7 +302,7 @@ Future<Set<Order>> getOrders(int restId) async {
       GetUnservedOrdersResultDto.fromJson(json.decode(response.body));
 
   orders.addAll(dd.Orders.map(
-      (e) => Order(e.content, e.addressString, e.addressAdditional)));
+      (e) => Order(e.id, e.content, e.addressString, e.addressAdditional)));
 
   if (response.statusCode == 200) {}
 
@@ -299,7 +399,114 @@ Future<void> sendMessage(String str) async {
   });
 }
 
-acceptOrder(int orderId)async
-{
+acceptOrder(int orderId) async {
+  SingletonDS db = SingletonDS();
 
+  bool trustSelfSigned = true;
+  HttpClient httpClient = new HttpClient()
+    ..badCertificateCallback =
+        ((X509Certificate cert, String host, int port) => trustSelfSigned);
+  IOClient ioClient = new IOClient(httpClient);
+
+  print(baseUrl + '/sos/requestsos?courierId=' + db.courierId.toString());
+
+  final response = await ioClient.post(Uri.parse(baseUrl + '/delivery/begin'),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'auth-token': db.token
+      },
+      body: json
+          .encode(BeginDeliveryDto(courierId: db.courierId, orderId: orderId)));
+
+  print(response.statusCode);
+  print(response.body);
+}
+
+Future<Set<AcceptedOrder>> getActiveOrders(int restId) async {
+  Set<AcceptedOrder> orders = {};
+  SingletonDS db = SingletonDS();
+
+  bool trustSelfSigned = true;
+  HttpClient httpClient = new HttpClient()
+    ..badCertificateCallback =
+        ((X509Certificate cert, String host, int port) => trustSelfSigned);
+  IOClient ioClient = new IOClient(httpClient);
+
+  print(Uri.parse(baseUrl +
+      '/delivery/getinprogressbycourier?courierId=' +
+      db.courierId.toString()));
+
+  final response = await ioClient.get(
+    Uri.parse(baseUrl +
+        '/delivery/getinprogressbycourier?courierId=' +
+        db.courierId.toString()),
+    headers: {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      'auth-token': db.token
+    },
+  );
+
+  print(response.statusCode);
+  print(response.body);
+
+  DeliveriesDto dd = DeliveriesDto.fromJson(json.decode(response.body));
+
+  print('deliv');
+
+  late OrderDto ordTem;
+
+  final resp = await ioClient.get(
+    Uri.parse(baseUrl +
+        '/order/GetInfo?orderId=' +
+        dd.deliveries.first.orderId.toString()),
+    headers: {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      'auth-token': db.token
+    },
+  );
+
+  print(json.decode(resp.body));
+  ordTem = OrderDto.fromJson(json.decode(response.body));
+
+  print('yolo');
+
+  Future.forEach(dd.deliveries, (DeliveryDto e) async {
+    final response = await ioClient.get(
+      Uri.parse(baseUrl + '/order/GetInfo?orderId=' + e.orderId.toString()),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        'auth-token': db.token
+      },
+    );
+
+    ordTem = OrderDto.fromJson(json.decode(response.body));
+
+    orders.add(Order(e.orderId, ordTem.content, ordTem.addressString,
+        ordTem.addressAdditional));
+  });
+
+  return orders;
+}
+
+finishOrder(int orderId) async {
+  SingletonDS db = SingletonDS();
+
+  bool trustSelfSigned = true;
+  HttpClient httpClient = new HttpClient()
+    ..badCertificateCallback =
+        ((X509Certificate cert, String host, int port) => trustSelfSigned);
+  IOClient ioClient = new IOClient(httpClient);
+
+  print(baseUrl + '/delivery/Finish');
+
+  final response = await ioClient.get(
+    Uri.parse(baseUrl + '/delivery/Finish?deliveryId'+orderId),
+    headers: {
+      HttpHeaders.contentTypeHeader: 'application/json',
+      'auth-token': db.token
+    },
+  );
+
+  print(response.statusCode);
+  print(response.body);
 }

@@ -1,3 +1,4 @@
+import 'package:courier_prototype/api_work/api_worker.dart';
 import 'package:courier_prototype/order/order_widget.dart';
 import 'package:flutter/material.dart';
 import 'order.dart';
@@ -11,8 +12,6 @@ class NewOrder extends StatefulWidget {
 }
 
 class _NewOrderState extends State<NewOrder> {
-
-  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -35,7 +34,9 @@ class _NewOrderState extends State<NewOrder> {
                 flex: 4,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.blue),
-                  onPressed: () {},
+                  onPressed: () {
+                    acceptOrder(widget.order!.order!.id);
+                  },
                   child: RichText(
                       text: TextSpan(
                           text: 'accept',

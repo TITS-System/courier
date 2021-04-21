@@ -177,9 +177,14 @@ class _HomeWidgetState extends State<HomeWidget> {
     // );
     // newOrdersW.add(NewOrder(order: curOrder));
     // newOrdersW.add(NewOrder(order: curOrder));
+    // 
+    Set<AcceptedOrder> ordsCur = await getActiveOrders(1);
 
-    Set<Order> ords = await getOrders(1);
+    Set<Order> ords = await getNewOrders(1);
     setState(() {
+      acceptedOrdersW.clear();
+      acceptedOrdersW.addAll(ordsCur);
+
       newOrdersW.clear();
       newOrdersW.addAll(ords.map((e) =>
           NewOrder(order: OrderWidget(order: e, showOnMap: _showNewOrdOnMap))));

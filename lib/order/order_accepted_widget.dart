@@ -1,3 +1,4 @@
+import 'package:courier_prototype/api_work/api_worker.dart';
 import 'package:courier_prototype/order/order_widget.dart';
 import 'package:flutter/material.dart';
 import 'order.dart';
@@ -32,8 +33,11 @@ class _AcceptedOrderState extends State<AcceptedOrder> {
               Expanded(
                 flex: 4,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Color.fromARGB(255, 55, 179, 74)),
-                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                      primary: Color.fromARGB(255, 55, 179, 74)),
+                  onPressed: () {
+                    finishOrder(widget.order!.order!.id);
+                  },
                   child: RichText(
                       text: TextSpan(
                           text: 'finish',
