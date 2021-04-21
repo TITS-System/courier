@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
+import 'api_work/api_worker.dart';
 import 'markers/marker_cur_popup.dart';
 import 'markers/marker_new_popup.dart';
 import 'order/order_new_widget.dart';
@@ -165,17 +166,24 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   _initializeOrders() async {
-    curOrder = OrderWidget(
-      order: Order('pizza', LatLng(53.307931, 34.301674), 'кв.10'),
-      showOnMap: _showCurOrdOnMap,
-    );
-    acceptedOrdersW.add(AcceptedOrder(order: curOrder));
-    curOrder = OrderWidget(
-      order: Order('pizza', LatLng(54.307931, 34.301674), 'кв.10'),
-      showOnMap: _showNewOrdOnMap,
-    );
-    newOrdersW.add(NewOrder(order: curOrder));
-    newOrdersW.add(NewOrder(order: curOrder));
+    // curOrder = OrderWidget(
+    //   order: Order('pizza', LatLng(53.307931, 34.301674), 'кв.10'),
+    //   showOnMap: _showCurOrdOnMap,
+    // );
+    // acceptedOrdersW.add(AcceptedOrder(order: curOrder));
+    // curOrder = OrderWidget(
+    //   order: Order('pizza', LatLng(54.307931, 34.301674), 'кв.10'),
+    //   showOnMap: _showNewOrdOnMap,
+    // );
+    // newOrdersW.add(NewOrder(order: curOrder));
+    // newOrdersW.add(NewOrder(order: curOrder));
+
+    Set<Order> ords = await getOrders(1);
+    setState(() {
+      newOrdersW.clear();
+      newOrdersW.addAll(ords.map((e) =>
+          NewOrder(order: OrderWidget(order: e, showOnMap: _showNewOrdOnMap))));
+    });
   }
 
   @override
@@ -191,7 +199,6 @@ class _HomeWidgetState extends State<HomeWidget> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         toolbarHeight: 10,
-        
       ),
       backgroundColor: Colors.white,
       body: Stack(
@@ -202,6 +209,11 @@ class _HomeWidgetState extends State<HomeWidget> {
                 SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
+                          ElevatedButton(
+                              onPressed: () {
+                                _initializeOrders();
+                              },
+                              child: Text('Update')),
                           (() {
                             if (acceptedOrdersW.length > 0) {
                               return RichText(

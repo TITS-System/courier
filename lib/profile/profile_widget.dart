@@ -1,3 +1,4 @@
+import 'package:courier_prototype/api_work/api_worker.dart';
 import 'package:flutter/material.dart';
 
 class ProfileWidget extends StatefulWidget {
@@ -6,6 +7,7 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
+  
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -31,7 +33,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.red,
                 ),
-                onPressed: () {},
+                onPressed: () {sendSos();},
                 child: RichText(
                     text: TextSpan(
                   text: 'SOS',

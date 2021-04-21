@@ -33,6 +33,7 @@ dependencies:
   flutter_polyline_points: ^0.2.6
   http: ^0.13.1
   uuid: ^2.2.2
+  json_annotation: ^4.0.0
 
 dev_dependencies:
   flutter_test:

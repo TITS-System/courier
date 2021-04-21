@@ -1,3 +1,4 @@
+import 'package:courier_prototype/api_work/api_worker.dart';
 import 'package:courier_prototype/home_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,11 @@ class AuthMainWidget extends StatefulWidget {
 class _AuthMainWidgetState extends State<AuthMainWidget> {
   final loginController = TextEditingController();
   final passwordController = TextEditingController();
+
+  _login()
+  {
+      login(LoginDto(Login:loginController.text,Password:passwordController.text),context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +79,7 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(primary: Colors.blue),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeWidget()));
+                        _login();
                       },
                       child: RichText(
                           text: TextSpan(

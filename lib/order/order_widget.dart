@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:courier_prototype/home_widget.dart';
 import 'package:courier_prototype/order/order.dart';
 import 'package:flutter/gestures.dart';
@@ -15,22 +17,31 @@ class OrderWidget extends StatefulWidget {
 }
 
 class _OrderWidgetState extends State<OrderWidget> {
-  String locationName = '';
-  Color fontColor = Colors.black; //Color.fromARGB(255, 255, 105, 0);
+  Color fontColor = Colors.black;
+  late LatLng latLng; //Color.fromARGB(255, 255, 105, 0);
 
-  _getLocationName(LatLng latlng) async {
-    final coordinates = new Coordinates(widget.order!.destLatLng.latitude,
-        (widget.order!.destLatLng.longitude));
-    var addresses =
-        await Geocoder.local.findAddressesFromCoordinates(coordinates);
+  // _getLocationName(LatLng latlng) async {
+  //   final coordinates = new Coordinates(widget.order!.destLatLng.latitude,
+  //       (widget.order!.destLatLng.longitude));
+  //   var addresses =
+  //       await Geocoder.local.findAddressesFromCoordinates(coordinates);
+  //   setState(() {
+  //     locationName = addresses.first.addressLine;
+  //   });
+  // }
+
+  getLocCoords() async {
+    final query = widget.order!.destStr;
+    var addresses = await Geocoder.local.findAddressesFromQuery(query);
+    var first = addresses.first;
     setState(() {
-      locationName = addresses.first.addressLine;
+      latLng = LatLng(first.coordinates.latitude, first.coordinates.longitude);
     });
   }
 
   @override
   void initState() {
-    _getLocationName(widget.order!.destLatLng);
+    getLocCoords();
 
     super.initState();
   }
@@ -47,7 +58,7 @@ class _OrderWidgetState extends State<OrderWidget> {
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: fontColor,
-                      fontSize: 30))),
+                      fontSize: 25))),
           RichText(
               text: TextSpan(
                   text: widget.order!.orderItems,
@@ -55,22 +66,22 @@ class _OrderWidgetState extends State<OrderWidget> {
           Text(' '),
           RichText(
               text: TextSpan(
-                  text: 'Adress: ',
+                  text: 'Address: ',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: fontColor,
-                      fontSize: 20))),
+                      fontSize: 25))),
           Container(
             child: RichText(
               text: TextSpan(
-                  text: locationName,
+                  text: widget.order!.destStr,
                   style: TextStyle(
                       color: Colors.blue,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
-                      widget.showOnMap!(widget.order!.destLatLng);
+                      widget.showOnMap!(latLng);
                     }),
             ),
             // padding:  EdgeInsets.all(2),
@@ -82,11 +93,11 @@ class _OrderWidgetState extends State<OrderWidget> {
           Text(' '),
           RichText(
               text: TextSpan(
-                  text: 'Adress additional info: ',
+                  text: 'Address additional info: ',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: fontColor,
-                      fontSize: 30))),
+                      fontSize: 25))),
           RichText(
               text: TextSpan(
                   text: widget.order!.destDesc,

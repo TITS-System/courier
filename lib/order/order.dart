@@ -2,7 +2,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Order {
   late String _orderItems;
-  late LatLng _destLatLng;
+  late String _destStr;
   late String _destDesc;
 
   String get orderItems=> _orderItems;
@@ -10,9 +10,9 @@ class Order {
     _orderItems = val;
   }
 
-  LatLng get destLatLng=> _destLatLng;
-  set destLatLng(LatLng val) {
-    _destLatLng = val;
+  String get destStr=> _destStr;
+  set destStr(String val) {
+    _destStr = val;
   }
 
   String get destDesc => _destDesc;
@@ -20,5 +20,5 @@ class Order {
     _destDesc = val;
   }
 
-  Order(this._orderItems, this._destLatLng,this._destDesc);
+  Order(this._orderItems, this._destStr,this._destDesc);
 }
