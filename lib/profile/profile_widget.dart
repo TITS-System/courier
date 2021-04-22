@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:courier_prototype/api_work/api_worker.dart';
+import 'package:courier_prototype/profile/show_on_map_page.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class ProfileWidget extends StatefulWidget {
@@ -9,13 +11,27 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
-  late StatsDto statDto=StatsDto(paths: [],averageDeliveryTime: 0,averageDistance: 0,averageSpeed: 0,canceledDeliveriesCount: 0,totalDistance: 0,finishedDeliveriesCount: 0);
+  late StatsDto statDto = StatsDto(
+      paths: [],
+      averageDeliveryTime: 0,
+      averageDistance: 0,
+      averageSpeed: 0,
+      canceledDeliveriesCount: 0,
+      totalDistance: 0,
+      finishedDeliveriesCount: 0);
 
   setStatDto() async {
     statDto = await getStats();
     setState(() {
       statDto = statDto;
     });
+  }
+
+  showOnMap(){
+     Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ShowOnMapWidget(
+              path: statDto.paths,
+            )));
   }
 
   @override
@@ -34,7 +50,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         Container(),
         RichText(
             text: TextSpan(
-          text: ' ',//'Иван',
+          text: ' ', //'Иван',
           style: TextStyle(
             color: Colors.black,
             fontSize: 40,
@@ -80,7 +96,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'пройдено: ${(statDto.totalDistance*100).toInt()/100.0} м',
+            text:
+                'пройдено: ${(statDto.totalDistance * 100).toInt() / 100.0} м',
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,
@@ -98,12 +115,15 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'показать путь за сегодня',
-            style: TextStyle(
-              color: Colors.blue,
-              fontSize: 30,
-            ),
-          )),
+                  text: 'показать путь за сегодня',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 30,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      showOnMap();
+                    })),
         ),
         Container(
           padding: EdgeInsets.all(10),
@@ -116,7 +136,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'средняя скорость: ${(statDto.averageSpeed*100).toInt()/100.0} м/с',
+            text:
+                'средняя скорость: ${(statDto.averageSpeed * 100).toInt() / 100.0} м/с',
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,
@@ -134,7 +155,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'среднее время выполнения заказа: ${(statDto.averageDeliveryTime*100).toInt()/100.0} с',
+            text:
+                'среднее время выполнения заказа: ${(statDto.averageDeliveryTime * 100).toInt() / 100.0} с',
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,

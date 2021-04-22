@@ -346,7 +346,7 @@ class StatsDto {
   final int canceledDeliveriesCount;
 }
 
-String baseUrl = "https://192.168.21.102:8443/api";
+String baseUrl = "https://akiana.io:8443/api";
 
 Future<void> login(LoginDto LoginDto, BuildContext context) async {
   bool trustSelfSigned = true;
