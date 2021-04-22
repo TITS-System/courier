@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:courier_prototype/api_work/api_worker.dart';
 import 'package:courier_prototype/messages/message_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,12 @@ class _MessagePageState extends State<MessagePage> {
   @override
   void initState() {
     _initializeMessages();
+    
+    const secs=const Duration(seconds: 2);
+
+    Timer.periodic(secs, (timer) {
+      print("reloading messages");
+      _initializeMessages();});
 
     super.initState();
   }

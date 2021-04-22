@@ -34,7 +34,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         Container(),
         RichText(
             text: TextSpan(
-          text: 'Иван',
+          text: ' ',//'Иван',
           style: TextStyle(
             color: Colors.black,
             fontSize: 40,
@@ -80,7 +80,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'пройдено: '+statDto.totalDistance.toString(),
+            text: 'пройдено: ${(statDto.totalDistance*100).toInt()/100.0} м',
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,
@@ -116,7 +116,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'средняя скорость: '+statDto.averageSpeed.toString(),
+            text: 'средняя скорость: ${(statDto.averageSpeed*100).toInt()/100.0} м/с',
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,
@@ -134,7 +134,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'среднее время выполнения заказа: '+statDto.averageDeliveryTime.toString(),
+            text: 'среднее время выполнения заказа: ${(statDto.averageDeliveryTime*100).toInt()/100.0} с',
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,

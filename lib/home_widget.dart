@@ -13,6 +13,8 @@ import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:webview_flutter/webview_flutter.dart';
+
 import 'api_work/api_worker.dart';
 import 'markers/marker_cur_popup.dart';
 import 'markers/marker_new_popup.dart';
@@ -302,6 +304,10 @@ class _HomeWidgetState extends State<HomeWidget> {
               return <Widget>[
                 MessagePage(),
               ];
+            case "game":
+              return <Widget>[
+                WebView(initialUrl: 'https://dodogame.netlify.app')
+              ];
             default:
               return <Widget>[];
           }
@@ -384,6 +390,23 @@ class _HomeWidgetState extends State<HomeWidget> {
                     });
                   },
                 ),
+                //IconButton(
+                //   iconSize: 30,
+                //   icon: Icon(Icons.gamepad),
+                //   splashColor: Colors.transparent,
+                //   highlightColor: Colors.transparent,
+                //   color: (() {
+                //     if (pageType == "game") {
+                //       return Color.fromARGB(255, 255, 105, 0);
+                //     }
+                //     return Color.fromARGB(155, 255, 105, 0);
+                //   }()),
+                //   onPressed: () {
+                //     setState(() {
+                //       pageType = "game";
+                //     });
+                //   },
+                // ),
                 IconButton(
                   iconSize: 30,
                   icon: Icon(Icons.gamepad),
