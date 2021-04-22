@@ -81,7 +81,7 @@ class _OrderWidgetState extends State<OrderWidget> {
                       fontWeight: FontWeight.bold),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
-                      widget.showOnMap!(latLng);
+                      widget.showOnMap!(latLng,widget.order!.id);
                     }),
             ),
             // padding:  EdgeInsets.all(2),

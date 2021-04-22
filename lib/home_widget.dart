@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:courier_prototype/messages/message_page.dart';
 import 'package:courier_prototype/order/order.dart';
 import 'package:courier_prototype/order/order_accepted_widget.dart';
@@ -9,6 +11,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'api_work/api_worker.dart';
 import 'markers/marker_cur_popup.dart';
@@ -38,14 +41,14 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   Set<Marker> _pathMarker = {};
 
-  _showCurOrdOnMap(LatLng latlng) {
+  _showCurOrdOnMap(LatLng latlng,int ordId) {
     setState(() {
       _center = latlng;
       final marker = Marker(
-        markerId: MarkerId(latlng.toString()),
+        markerId: MarkerId(ordId.toString()),
         position: _center,
         onTap: () {
-          _openCurMarker(MarkerId(latlng.toString()));
+          _openCurMarker(MarkerId(ordId.toString()));
         },
       );
       _markers.add(marker);
@@ -53,15 +56,15 @@ class _HomeWidgetState extends State<HomeWidget> {
     });
   }
 
-  _showNewOrdOnMap(LatLng latlng) {
+  _showNewOrdOnMap(LatLng latlng,int ordId) {
     setState(() {
       _center = latlng;
       final marker = Marker(
         alpha: 0.5,
-        markerId: MarkerId(latlng.toString()),
+        markerId: MarkerId(ordId.toString()),
         position: _center,
         onTap: () {
-          _openNewMarker(MarkerId(latlng.toString()));
+          _openNewMarker(MarkerId(ordId.toString()));
         },
       );
       _markers.add(marker);
@@ -70,6 +73,14 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   Future<void> _onMapCreated(GoogleMapController controller) async {
+    LatLng restPos = await getRestaurant(1);
+
+    _markers.add(Marker(
+        markerId: MarkerId('rest'),
+        position: restPos,
+        icon: await BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(size: Size(3, 3)), "assets/rest_mark.png")));
+
     rootBundle.loadString('assets/map_style.txt').then((string) {
       controller.setMapStyle(string);
       setState(() {
@@ -80,6 +91,8 @@ class _HomeWidgetState extends State<HomeWidget> {
     _mapController = controller;
     _location.onLocationChanged.listen((l) {
       _curPos = LatLng(l.latitude!, l.longitude!);
+
+      addLocToAllDeliveries(LatLng(l.latitude!, l.longitude!));
 
       _drawPath();
     });
@@ -117,6 +130,21 @@ class _HomeWidgetState extends State<HomeWidget> {
       _polylines.clear();
       _drawPath();
     });
+  }
+
+  _deleteMarkById(MarkerId markerId){
+    Marker? mark = _markers.firstWhere((element) => element.markerId==markerId,orElse: (){return Marker(markerId: MarkerId('-1'))});
+    if (mark.markerId==MarkerId('-1')) {
+      
+    }else{
+       setState(() {
+      _markers.remove(mark);
+      _pathMarker.remove(mark);
+      _polylines.clear();
+      _drawPath();
+    });
+    }
+   
   }
 
   _drawMarkerPath(Marker mark) {
@@ -166,19 +194,9 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   _initializeOrders() async {
-    // curOrder = OrderWidget(
-    //   order: Order('pizza', LatLng(53.307931, 34.301674), 'кв.10'),
-    //   showOnMap: _showCurOrdOnMap,
-    // );
-    // acceptedOrdersW.add(AcceptedOrder(order: curOrder));
-    // curOrder = OrderWidget(
-    //   order: Order('pizza', LatLng(54.307931, 34.301674), 'кв.10'),
-    //   showOnMap: _showNewOrdOnMap,
-    // );
-    // newOrdersW.add(NewOrder(order: curOrder));
-    // newOrdersW.add(NewOrder(order: curOrder));
-    // 
-    Set<AcceptedOrder> ordsCur = await getActiveOrders(1);
+   // print('init');
+
+    Set<AcceptedOrder> ordsCur = await getActiveOrders(1, _showCurOrdOnMap,_initializeOrders,_deleteMarkById);
 
     Set<Order> ords = await getNewOrders(1);
     setState(() {
@@ -187,13 +205,16 @@ class _HomeWidgetState extends State<HomeWidget> {
 
       newOrdersW.clear();
       newOrdersW.addAll(ords.map((e) =>
-          NewOrder(order: OrderWidget(order: e, showOnMap: _showNewOrdOnMap))));
+          NewOrder(order: OrderWidget(order: e, showOnMap: _showNewOrdOnMap),initOrds: _initializeOrders,remMar: _deleteMarkById,)));
     });
   }
 
   @override
   void initState() {
     _initializeOrders();
+    const secs=const Duration(seconds: 5);
+
+    Timer.periodic(secs, (timer) {_initializeOrders();});
 
     super.initState();
   }
@@ -214,11 +235,6 @@ class _HomeWidgetState extends State<HomeWidget> {
                 SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                          ElevatedButton(
-                              onPressed: () {
-                                _initializeOrders();
-                              },
-                              child: Text('Update')),
                           (() {
                             if (acceptedOrdersW.length > 0) {
                               return RichText(
@@ -366,6 +382,21 @@ class _HomeWidgetState extends State<HomeWidget> {
                     setState(() {
                       pageType = "messages";
                     });
+                  },
+                ),
+                IconButton(
+                  iconSize: 30,
+                  icon: Icon(Icons.gamepad),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  color: Color.fromARGB(155, 255, 105, 0),
+                  onPressed: () async {
+                    const url = 'https://dodogame.netlify.app';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
                   },
                 ),
               ],

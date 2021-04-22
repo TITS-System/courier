@@ -1,5 +1,4 @@
 import 'package:courier_prototype/api_work/api_worker.dart';
-import 'package:courier_prototype/home_widget.dart';
 import 'package:flutter/material.dart';
 
 class AuthMainWidget extends StatefulWidget {
@@ -11,15 +10,17 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
   final loginController = TextEditingController();
   final passwordController = TextEditingController();
 
-  _login()
-  {
-      login(LoginDto(Login:loginController.text,Password:passwordController.text),context);
+  _login() {
+    login(
+        LoginDto(
+            Login: loginController.text, Password: passwordController.text),
+        context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 105, 0),
+      backgroundColor: Colors.white,
       body: Container(
         padding: EdgeInsets.all(10),
         child: Column(
@@ -28,7 +29,7 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
             RichText(
               text: TextSpan(
                 text: 'login',
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(color: Color.fromARGB(255, 255, 105, 0), fontSize: 20),
               ),
             ),
             Container(
@@ -42,15 +43,17 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
                 ),
               ),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 255, 255, 255),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: Color.fromARGB(0, 255, 105, 0),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                border: Border.all(
+                    color: Color.fromARGB(255, 255, 105, 0), width: 3),
               ),
             ),
             Text(' '),
             RichText(
               text: TextSpan(
                 text: 'password',
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(color: Color.fromARGB(255, 255, 105, 0), fontSize: 20),
               ),
             ),
             Container(
@@ -64,8 +67,10 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
                 ),
               ),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 255, 255, 255),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                color: Color.fromARGB(0, 255, 105, 0),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                border: Border.all(
+                    color: Color.fromARGB(255, 255, 105, 0), width: 3),
               ),
             ),
             Text(' '),
@@ -83,7 +88,7 @@ class _AuthMainWidgetState extends State<AuthMainWidget> {
                       },
                       child: RichText(
                           text: TextSpan(
-                              text: 'sign in',
+                              text: 'SIGN IN',
                               style: TextStyle(
                                   color: Colors.white, fontSize: 20))),
                     ),

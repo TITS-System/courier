@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:courier_prototype/api_work/api_worker.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +9,22 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
-  
+  late StatsDto statDto=StatsDto(paths: [],averageDeliveryTime: 0,averageDistance: 0,averageSpeed: 0,canceledDeliveriesCount: 0,totalDistance: 0,finishedDeliveriesCount: 0);
+
+  setStatDto() async {
+    statDto = await getStats();
+    setState(() {
+      statDto = statDto;
+    });
+  }
+
+  @override
+  void initState() {
+    setStatDto();
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -33,7 +50,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 style: ElevatedButton.styleFrom(
                   primary: Colors.red,
                 ),
-                onPressed: () {sendSos();},
+                onPressed: () {
+                  sendSos();
+                },
                 child: RichText(
                     text: TextSpan(
                   text: 'SOS',
@@ -61,7 +80,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'пройдено: 35км',
+            text: 'пройдено: '+statDto.totalDistance.toString(),
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,
@@ -97,7 +116,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'средняя скорость: 8 км/ч',
+            text: 'средняя скорость: '+statDto.averageSpeed.toString(),
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,
@@ -115,7 +134,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           child: RichText(
               text: TextSpan(
-            text: 'среднее время выполнения заказа: 32 мин',
+            text: 'среднее время выполнения заказа: '+statDto.averageDeliveryTime.toString(),
             style: TextStyle(
               color: Colors.black,
               fontSize: 30,

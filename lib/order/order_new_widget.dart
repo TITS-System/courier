@@ -5,7 +5,9 @@ import 'order.dart';
 
 class NewOrder extends StatefulWidget {
   final OrderWidget? order;
-  const NewOrder({Key? key, this.order}) : super(key: key);
+  final Function? remMar;
+  final Function? initOrds;
+  const NewOrder({Key? key, this.order,this.initOrds,this.remMar}) : super(key: key);
 
   @override
   _NewOrderState createState() => _NewOrderState();
@@ -35,7 +37,7 @@ class _NewOrderState extends State<NewOrder> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(primary: Colors.blue),
                   onPressed: () {
-                    acceptOrder(widget.order!.order!.id);
+                    acceptOrder(widget.order!.order!.id,widget.initOrds!,widget.remMar!);
                   },
                   child: RichText(
                       text: TextSpan(
