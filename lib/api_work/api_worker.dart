@@ -646,6 +646,8 @@ cancelOrder(
 }
 
 addLocToAllDeliveries(LatLng latlng) async {
+  print('LOCATIONS');
+
   SingletonDS db = SingletonDS();
 
   bool trustSelfSigned = true;
