@@ -196,7 +196,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   _initializeOrders() async {
-   // print('init');
+   print('init');
 
     Set<AcceptedOrder> ordsCur = await getActiveOrders(1, _showCurOrdOnMap,_initializeOrders,_deleteMarkById);
 
@@ -237,6 +237,18 @@ class _HomeWidgetState extends State<HomeWidget> {
                 SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
+                        ((){
+                          if(acceptedOrdersW.length<1&&newOrdersW.length <1)
+                          { return RichText(
+                                  text: TextSpan(
+                                      text: 'NO ORDERS',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 40,
+                                          color: Colors.black)));
+                                          }
+                                          return Container();
+                                          }()),
                           (() {
                             if (acceptedOrdersW.length > 0) {
                               return RichText(

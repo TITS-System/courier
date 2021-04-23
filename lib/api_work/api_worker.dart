@@ -399,8 +399,8 @@ Future<Set<Order>> getNewOrders(int restId) async {
     },
   );
 
-  // print(response.statusCode);
-  // print(response.body);
+  print(response.statusCode);
+  print(response.body);
 
   GetUnservedOrdersResultDto dd =
       GetUnservedOrdersResultDto.fromJson(json.decode(response.body));
@@ -554,8 +554,8 @@ Future<Set<AcceptedOrder>> getActiveOrders(int restId, Function? showOnMap,
     },
   );
 
-  // print(response.statusCode);
-  // print(response.body);
+  print(response.statusCode);
+  print(response.body);
 
   DeliveriesDto dd = DeliveriesDto.fromJson(json.decode(response.body));
 
